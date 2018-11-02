@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+
         initViews();
 
         mDownlaodThread = new DownloadThread(MainActivity.this);
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         log("Running code");
         displayProgressBar(true);
+
 
         //send message to download handler
 
