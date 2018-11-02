@@ -58,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
             message.obj=song;
             mDownlaodThread.mHandler.sendMessage(message);
 
+            //some changes for git demo
+
+
         }
 
     }
