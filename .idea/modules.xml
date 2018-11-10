@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AndroidConcurrency-master.iml" filepath="$PROJECT_DIR$/AndroidConcurrency-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AndroidServices.iml" filepath="$PROJECT_DIR$/AndroidServices.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
