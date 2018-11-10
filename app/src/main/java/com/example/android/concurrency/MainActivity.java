@@ -1,10 +1,14 @@
 package com.example.android.concurrency;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ResultReceiver;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +25,16 @@ public class MainActivity extends AppCompatActivity {
     private ScrollView mScroll;
     private TextView mLog;
     private ProgressBar mProgressBar;
-    private Handler mHandler;
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String songName=intent.getStringExtra(MESSAGE_KEY);
+            log(songName+" Downloaded...");
+
+            Log.d(TAG, "onReceive: Thread name: "+Thread.currentThread().getName());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initViews();
-        mHandler=new Handler();
     }
 
     public void runCode(View v) {
@@ -38,16 +50,27 @@ public class MainActivity extends AppCompatActivity {
 
         //send intent to download service
 
-        ResultReceiver resultReceiver=new MyDownlaodResultReceiver(null);
-
         for (String song:Playlist.songs){
             Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
             intent.putExtra(MESSAGE_KEY,song);
-            intent.putExtra(Intent.EXTRA_RESULT_RECEIVER,resultReceiver);
 
             startService(intent);
         }
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(getApplicationContext()
+        ).registerReceiver(mReceiver,new IntentFilter(DownloadHandler.SERVICE_MESSAGE));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .unregisterReceiver(mReceiver);
     }
 
     private void initViews() {
@@ -88,38 +111,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public class MyDownlaodResultReceiver extends ResultReceiver{
-
-        public MyDownlaodResultReceiver(Handler handler) {
-            super(handler);
-        }
-
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-            super.onReceiveResult(resultCode, resultData);
-
-            if(resultCode == RESULT_OK && resultData!=null){
-
-                Log.d(TAG, "onReceiveResult: Thread name: "+Thread.currentThread().getName());
-
-                final String songName=resultData.getString(MESSAGE_KEY);
-
-//                MainActivity.this.runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        log(songName+" Downloaded");
-//                    }
-//                });
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        log(songName+" Downloaded");
-                    }
-                });
-
-            }
-
-        }
-    }
 }

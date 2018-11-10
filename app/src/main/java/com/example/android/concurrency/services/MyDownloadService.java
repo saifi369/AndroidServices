@@ -33,6 +33,7 @@ public class MyDownloadService extends Service {
 
         }
         mDownlaodThread.mHandler.setService(this);
+        mDownlaodThread.mHandler.setContext(getApplicationContext());
     }
 
     @Override
@@ -41,9 +42,6 @@ public class MyDownloadService extends Service {
         Log.d(TAG, "onStartCommand: called with Song Name: "+
                 intent.getStringExtra(MainActivity.MESSAGE_KEY)+ " Intent Id: "+startId);
         final String songName=intent.getStringExtra(MainActivity.MESSAGE_KEY);
-
-        mDownlaodThread.mHandler.setResultRecevier((ResultReceiver)
-                intent.getParcelableExtra(Intent.EXTRA_RESULT_RECEIVER));
 
         Message message=Message.obtain();
         message.obj=songName;
@@ -58,16 +56,6 @@ public class MyDownloadService extends Service {
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: called");
         return null;
-    }
-
-    private void downloadSong(final String songName){
-        Log.d(TAG, "run: staring download");
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG, "downloadSong: "+songName+" Downloaded...");
     }
 
     @Override

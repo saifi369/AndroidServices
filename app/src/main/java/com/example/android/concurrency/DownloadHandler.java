@@ -1,12 +1,10 @@
 package com.example.android.concurrency;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
+import android.content.Intent;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.os.ResultReceiver;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.example.android.concurrency.services.MyDownloadService;
@@ -14,8 +12,10 @@ import com.example.android.concurrency.services.MyDownloadService;
 public class DownloadHandler extends Handler {
 
     private static final String TAG = "MyTag";
+    public static final String SERVICE_MESSAGE = "ServiceMessage";
     private MyDownloadService mService;
-    private ResultReceiver mResultRecevier;
+    private Context mContext;
+
 
     public DownloadHandler() {
     }
@@ -27,9 +27,18 @@ public class DownloadHandler extends Handler {
         mService.stopSelf(msg.arg1);
         Log.d(TAG, "handleMessage: Song Downloaded: "+msg.obj.toString() + " Intent Id: "+msg.arg1);
 
-        Bundle bundle=new Bundle();
-        bundle.putString(MainActivity.MESSAGE_KEY,msg.obj.toString());
-        mResultRecevier.send(MainActivity.RESULT_OK,bundle);
+        sendMessageToUi(msg.obj.toString());
+
+    }
+
+    private void sendMessageToUi(String s) {
+        Intent intent=new Intent(SERVICE_MESSAGE);
+        intent.putExtra(MainActivity.MESSAGE_KEY,s);
+
+        //local broad cast receiver
+
+        LocalBroadcastManager.getInstance(mContext)
+                .sendBroadcast(intent);
 
     }
 
@@ -48,7 +57,8 @@ public class DownloadHandler extends Handler {
         this.mService=downloadService;
     }
 
-    public void setResultRecevier(ResultReceiver mResultRecevier) {
-        this.mResultRecevier = mResultRecevier;
+    public void setContext(Context context){
+        this.mContext=context;
     }
+
 }
