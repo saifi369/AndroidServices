@@ -11,6 +11,7 @@ import com.example.android.concurrency.MainActivity;
 
 public class MyDownloadService extends Service {
     private static final String TAG = "MyTag";
+    private DownloadThread mDownlaodThread;
 
     //this is started service
 
@@ -22,6 +23,13 @@ public class MyDownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate: called");
+
+        mDownlaodThread=new DownloadThread();
+        mDownlaodThread.start();
+
+        while (mDownlaodThread.mHandler == null){
+
+        }
     }
 
     @Override
