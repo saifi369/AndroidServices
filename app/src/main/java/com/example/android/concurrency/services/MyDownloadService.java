@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.example.android.concurrency.DownloadHandler;
+import com.example.android.concurrency.DownloadThread;
 import com.example.android.concurrency.MainActivity;
 
 public class MyDownloadService extends Service {
@@ -16,16 +18,32 @@ public class MyDownloadService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "onCreate: called");
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        String songName=intent.getStringExtra(MainActivity.MESSAGE_KEY);
-        downloadSong(songName);
+        Log.d(TAG, "onStartCommand: called");
+        final String songName=intent.getStringExtra(MainActivity.MESSAGE_KEY);
+
+        Thread thread=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                downloadSong(songName);
+            }
+        });
+
+        thread.start();
 
         return Service.START_REDELIVER_INTENT;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind: called");
         return null;
     }
 
@@ -39,4 +57,9 @@ public class MyDownloadService extends Service {
         Log.d(TAG, "downloadSong: "+songName+" Downloaded...");
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: called");
+    }
 }

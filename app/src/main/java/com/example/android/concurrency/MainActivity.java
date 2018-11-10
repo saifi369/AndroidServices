@@ -51,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clearOutput(View v) {
+
+        Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
+        stopService(intent);
+
         mLog.setText("");
         scrollTextToEnd();
     }
