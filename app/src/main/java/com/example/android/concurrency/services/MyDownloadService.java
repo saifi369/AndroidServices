@@ -3,6 +3,7 @@ package com.example.android.concurrency.services;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 
 import com.example.android.concurrency.DownloadHandler;
@@ -30,22 +31,21 @@ public class MyDownloadService extends Service {
         while (mDownlaodThread.mHandler == null){
 
         }
+        mDownlaodThread.mHandler.setService(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.d(TAG, "onStartCommand: called");
+        Log.d(TAG, "onStartCommand: called with Song Name: "+
+                intent.getStringExtra(MainActivity.MESSAGE_KEY)+ " Intent Id: "+startId);
         final String songName=intent.getStringExtra(MainActivity.MESSAGE_KEY);
 
-        Thread thread=new Thread(new Runnable() {
-            @Override
-            public void run() {
-                downloadSong(songName);
-            }
-        });
+        Message message=Message.obtain();
+        message.obj=songName;
+        message.arg1=startId;
 
-        thread.start();
+        mDownlaodThread.mHandler.sendMessage(message);
 
         return Service.START_REDELIVER_INTENT;
     }
