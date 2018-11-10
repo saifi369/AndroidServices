@@ -2,10 +2,14 @@ package com.example.android.concurrency;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+
+import com.example.android.concurrency.services.MyDownloadService;
 
 public class DownloadHandler extends Handler {
 
@@ -30,4 +34,5 @@ public class DownloadHandler extends Handler {
 
         Log.d(TAG, "downloadSong: "+songName+" Downloaded...");
     }
+
 }

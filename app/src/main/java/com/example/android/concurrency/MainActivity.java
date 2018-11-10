@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initViews();
+
     }
 
     public void runCode(View v) {
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         //send intent to download service
 
         for (String song:Playlist.songs){
+
             Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
             intent.putExtra(MESSAGE_KEY,song);
 
@@ -81,4 +84,5 @@ public class MainActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.INVISIBLE);
         }
     }
+
 }
