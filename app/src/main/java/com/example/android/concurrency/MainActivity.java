@@ -1,5 +1,6 @@
 package com.example.android.concurrency;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,57 +11,35 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.android.concurrency.services.MyDownloadService;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MyTag";
-    private static final String MESSAGE_KEY = "message_key";
+    public static final String MESSAGE_KEY = "message_key";
     private ScrollView mScroll;
     private TextView mLog;
     private ProgressBar mProgressBar;
-    public Handler mHandler;
 
-    DownloadThread mDownlaodThread;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mHandler=new Handler(getMainLooper()){
-            @Override
-            public void handleMessage(Message msg) {
-
-                String data=msg.getData().getString(MESSAGE_KEY);
-
-                Log.d(TAG, "handleMessage: "+data);
-
-            }
-        };
-
-
         initViews();
-
-        mDownlaodThread = new DownloadThread(MainActivity.this);
-        mDownlaodThread.setName("Download Thread");
-        mDownlaodThread.start();
     }
 
     public void runCode(View v) {
-
         log("Running code");
         displayProgressBar(true);
 
-
-        //send message to download handler
-
+        //send intent to download service
 
         for (String song:Playlist.songs){
-            Message message= Message.obtain();
-            message.obj=song;
-            mDownlaodThread.mHandler.sendMessage(message);
+            Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
+            intent.putExtra(MESSAGE_KEY,song);
 
-            //some changes for git demo
-
-
+            startService(intent);
         }
 
     }
