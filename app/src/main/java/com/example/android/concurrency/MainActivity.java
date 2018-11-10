@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private ScrollView mScroll;
     private TextView mLog;
     private ProgressBar mProgressBar;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initViews();
+        mHandler=new Handler();
     }
 
     public void runCode(View v) {
@@ -35,9 +38,12 @@ public class MainActivity extends AppCompatActivity {
 
         //send intent to download service
 
+        ResultReceiver resultReceiver=new MyDownlaodResultReceiver(null);
+
         for (String song:Playlist.songs){
             Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
             intent.putExtra(MESSAGE_KEY,song);
+            intent.putExtra(Intent.EXTRA_RESULT_RECEIVER,resultReceiver);
 
             startService(intent);
         }
@@ -79,6 +85,41 @@ public class MainActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.VISIBLE);
         } else {
             mProgressBar.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public class MyDownlaodResultReceiver extends ResultReceiver{
+
+        public MyDownlaodResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            super.onReceiveResult(resultCode, resultData);
+
+            if(resultCode == RESULT_OK && resultData!=null){
+
+                Log.d(TAG, "onReceiveResult: Thread name: "+Thread.currentThread().getName());
+
+                final String songName=resultData.getString(MESSAGE_KEY);
+
+//                MainActivity.this.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        log(songName+" Downloaded");
+//                    }
+//                });
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        log(songName+" Downloaded");
+                    }
+                });
+
+            }
+
         }
     }
 }

@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.example.android.concurrency.DownloadHandler;
@@ -40,6 +41,9 @@ public class MyDownloadService extends Service {
         Log.d(TAG, "onStartCommand: called with Song Name: "+
                 intent.getStringExtra(MainActivity.MESSAGE_KEY)+ " Intent Id: "+startId);
         final String songName=intent.getStringExtra(MainActivity.MESSAGE_KEY);
+
+        mDownlaodThread.mHandler.setResultRecevier((ResultReceiver)
+                intent.getParcelableExtra(Intent.EXTRA_RESULT_RECEIVER));
 
         Message message=Message.obtain();
         message.obj=songName;

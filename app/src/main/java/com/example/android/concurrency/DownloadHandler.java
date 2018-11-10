@@ -2,9 +2,11 @@ package com.example.android.concurrency;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.example.android.concurrency.services.MyDownloadService;
@@ -13,6 +15,7 @@ public class DownloadHandler extends Handler {
 
     private static final String TAG = "MyTag";
     private MyDownloadService mService;
+    private ResultReceiver mResultRecevier;
 
     public DownloadHandler() {
     }
@@ -23,6 +26,11 @@ public class DownloadHandler extends Handler {
         downloadSong(msg.obj.toString());
         mService.stopSelf(msg.arg1);
         Log.d(TAG, "handleMessage: Song Downloaded: "+msg.obj.toString() + " Intent Id: "+msg.arg1);
+
+        Bundle bundle=new Bundle();
+        bundle.putString(MainActivity.MESSAGE_KEY,msg.obj.toString());
+        mResultRecevier.send(MainActivity.RESULT_OK,bundle);
+
     }
 
     private void downloadSong(final String songName){
@@ -38,5 +46,9 @@ public class DownloadHandler extends Handler {
 
     public void setService(MyDownloadService downloadService) {
         this.mService=downloadService;
+    }
+
+    public void setResultRecevier(ResultReceiver mResultRecevier) {
+        this.mResultRecevier = mResultRecevier;
     }
 }

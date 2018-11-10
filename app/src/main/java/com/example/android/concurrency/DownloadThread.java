@@ -21,6 +21,7 @@ public class DownloadThread extends Thread {
         Looper.prepare();
         mHandler=new DownloadHandler();
         Looper.loop();
+        this.setName("MyDownloadThread");
 
     }
 }
