@@ -4,14 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.ResultReceiver;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -30,27 +25,26 @@ public class MainActivity extends AppCompatActivity {
     private ScrollView mScroll;
     private TextView mLog;
     private ProgressBar mProgressBar;
-    private MusicPlayerService mMusicService;
-    private final ServiceConnection mServiceCon=new ServiceConnection() {
+    private MusicPlayerService mMusicPlayerService;
+    private boolean mBound=false;
+    private ServiceConnection mServiceCon = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder iBinder) {
-            MusicPlayerService.MyServiceBinder serviceBinder=
+
+            MusicPlayerService.MyServiceBinder myServiceBinder=
                     (MusicPlayerService.MyServiceBinder) iBinder;
-
-            mMusicService=serviceBinder.getService();
-            Log.d(TAG, "onServiceConnected: Service connected");
-
+            mMusicPlayerService=myServiceBinder.getService();
+            mBound=true;
+            Log.d(TAG, "onServiceConnected");
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            if (mMusicService != null) {
-                mMusicService=null;
-            }
-            Log.d(TAG, "onServiceDisconnected: Service Disconnected");
-
+            Log.d(TAG, "onServiceDisconnected");
         }
     };
+
+
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -71,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void runCode(View v) {
-        log(mMusicService.getValue());
+        log(mMusicPlayerService.getValue());
         displayProgressBar(true);
 
         //send intent to download service
@@ -84,9 +78,19 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
+    public void clearOutput(View v) {
+
+        Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
+        stopService(intent);
+
+        mLog.setText("");
+        scrollTextToEnd();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+
         Intent intent=new Intent(MainActivity.this,MusicPlayerService.class);
         bindService(intent,mServiceCon,Context.BIND_AUTO_CREATE);
 
@@ -95,17 +99,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(mServiceCon);
-        Log.d(TAG, "onStop: Service Unbind");
-    }
 
-    public void clearOutput(View v) {
+        if(mBound){
+            unbindService(mServiceCon);
+            mBound=false;
+        }
 
-        Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
-        stopService(intent);
-
-        mLog.setText("");
-        scrollTextToEnd();
     }
 
     public void log(String message) {
@@ -136,5 +135,4 @@ public class MainActivity extends AppCompatActivity {
         mLog = (TextView) findViewById(R.id.tvLog);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
     }
-
 }

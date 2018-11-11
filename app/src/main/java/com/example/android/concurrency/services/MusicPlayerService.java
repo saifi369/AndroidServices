@@ -10,7 +10,7 @@ import android.util.Log;
 public class MusicPlayerService extends Service {
 
     private static final String TAG = "MyTag";
-    private final Binder mServiceBinder =new MyServiceBinder();
+    private final Binder mBinder = new MyServiceBinder();
 
     @Override
     public void onCreate() {
@@ -18,9 +18,9 @@ public class MusicPlayerService extends Service {
         Log.d(TAG, "onCreate: ");
     }
 
-     public class MyServiceBinder extends Binder{
+    public class MyServiceBinder extends Binder{
         public MusicPlayerService getService(){
-            return MusicPlayerService.this;
+            return  MusicPlayerService.this;
         }
     }
 
@@ -34,7 +34,7 @@ public class MusicPlayerService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: ");
-        return mServiceBinder;
+        return mBinder;
     }
 
     @Override
@@ -50,6 +50,7 @@ public class MusicPlayerService extends Service {
     }
 
     public String getValue(){
-        return "value from service";
+        return "data from service";
     }
+
 }
