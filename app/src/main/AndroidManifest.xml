@@ -24,6 +24,9 @@
         <service
             android:name=".services.MyIntentService"
             android:exported="false"></service>
+        <service
+            android:name=".services.MusicPlayerService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
