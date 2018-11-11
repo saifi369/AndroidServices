@@ -20,6 +20,9 @@
         <service
             android:name=".services.MyDownloadService"
             android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".services.MyIntentService"
             android:exported="false"></service>
     </application>
 
