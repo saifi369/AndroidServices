@@ -19,15 +19,17 @@ public class MyIntentService extends IntentService {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate: MyIntentService");
+        Log.d(TAG, "onCreate: Thread name: "+Thread.currentThread().getName());
+
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(TAG, "onHandleIntent: MyIntentService");
+        Log.d(TAG, "onHandleIntent: Thread name: "+Thread.currentThread().getName());
 
         String songName=intent.getStringExtra(MainActivity.MESSAGE_KEY);
         downloadSong(songName);
-
     }
 
     private void downloadSong(final String songName){
@@ -45,5 +47,7 @@ public class MyIntentService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: MyIntentService");
+        Log.d(TAG, "onDestroy: Thread name: "+Thread.currentThread().getName());
+
     }
 }
