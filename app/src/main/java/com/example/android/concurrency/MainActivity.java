@@ -1,11 +1,14 @@
 package com.example.android.concurrency;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.ResultReceiver;
 import android.support.v4.content.LocalBroadcastManager;
@@ -16,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.android.concurrency.services.MusicPlayerService;
 import com.example.android.concurrency.services.MyDownloadService;
 import com.example.android.concurrency.services.MyIntentService;
 
@@ -26,6 +30,27 @@ public class MainActivity extends AppCompatActivity {
     private ScrollView mScroll;
     private TextView mLog;
     private ProgressBar mProgressBar;
+    private MusicPlayerService mMusicService;
+    private final ServiceConnection mServiceCon=new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            MusicPlayerService.MyServiceBinder serviceBinder=
+                    (MusicPlayerService.MyServiceBinder) iBinder;
+
+            mMusicService=serviceBinder.getService();
+            Log.d(TAG, "onServiceConnected: Service connected");
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            if (mMusicService != null) {
+                mMusicService=null;
+            }
+            Log.d(TAG, "onServiceDisconnected: Service Disconnected");
+
+        }
+    };
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -46,38 +71,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void runCode(View v) {
-        log("Running code");
+        log(mMusicService.getValue());
         displayProgressBar(true);
 
         //send intent to download service
 
-        for (String song:Playlist.songs){
-            Intent intent=new Intent(MainActivity.this,MyIntentService.class);
-            intent.putExtra(MESSAGE_KEY,song);
-
-            startService(intent);
-        }
-
+//        for (String song:Playlist.songs){
+//            Intent intent=new Intent(MainActivity.this,MyIntentService.class);
+//            intent.putExtra(MESSAGE_KEY,song);
+//
+//            startService(intent);
+//        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(getApplicationContext()
-        ).registerReceiver(mReceiver,new IntentFilter(MyIntentService.INTENT_SERVICE_MESSAGE));
+        Intent intent=new Intent(MainActivity.this,MusicPlayerService.class);
+        bindService(intent,mServiceCon,Context.BIND_AUTO_CREATE);
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(getApplicationContext())
-                .unregisterReceiver(mReceiver);
-    }
-
-    private void initViews() {
-        mScroll = (ScrollView) findViewById(R.id.scrollLog);
-        mLog = (TextView) findViewById(R.id.tvLog);
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        unbindService(mServiceCon);
+        Log.d(TAG, "onStop: Service Unbind");
     }
 
     public void clearOutput(View v) {
@@ -110,6 +129,12 @@ public class MainActivity extends AppCompatActivity {
         } else {
             mProgressBar.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void initViews() {
+        mScroll = (ScrollView) findViewById(R.id.scrollLog);
+        mLog = (TextView) findViewById(R.id.tvLog);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
     }
 
 }
