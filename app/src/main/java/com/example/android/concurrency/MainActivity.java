@@ -4,12 +4,17 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -18,12 +23,15 @@ import com.example.android.concurrency.services.MusicPlayerService;
 import com.example.android.concurrency.services.MyDownloadService;
 import com.example.android.concurrency.services.MyIntentService;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MyTag";
     public static final String MESSAGE_KEY = "message_key";
     private ScrollView mScroll;
     private TextView mLog;
+    private Button mPlayButton;
     private ProgressBar mProgressBar;
     private MusicPlayerService mMusicPlayerService;
     private boolean mBound=false;
@@ -49,8 +57,12 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String songName=intent.getStringExtra(MESSAGE_KEY);
-            log(songName+" Downloaded...");
+//            String songName=intent.getStringExtra(MESSAGE_KEY);
+            String result=intent.getStringExtra(MESSAGE_KEY);
+            if(result == "done")
+                mPlayButton.setText("Play");
+
+            //log(songName+" Downloaded...");
 
             Log.d(TAG, "onReceive: Thread name: "+Thread.currentThread().getName());
         }
@@ -62,10 +74,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initViews();
+
+    }
+
+    public void onBtnMusicClicked(View view) {
+
+        if(mBound){
+
+            if(mMusicPlayerService.isPlaying()){
+                mMusicPlayerService.pause();
+                mPlayButton.setText("Play");
+            }else{
+                mMusicPlayerService.play();
+                mPlayButton.setText("Pause");
+            }
+
+        }
+
     }
 
     public void runCode(View v) {
-        log(mMusicPlayerService.getValue());
+        log("Playing Music Buddy!");
         displayProgressBar(true);
 
         //send intent to download service
@@ -94,6 +123,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent=new Intent(MainActivity.this,MusicPlayerService.class);
         bindService(intent,mServiceCon,Context.BIND_AUTO_CREATE);
 
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .registerReceiver(mReceiver,new IntentFilter(MusicPlayerService.MUSIC_COMPLETE));
+
     }
 
     @Override
@@ -104,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
             unbindService(mServiceCon);
             mBound=false;
         }
+
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .unregisterReceiver(mReceiver);
 
     }
 
@@ -134,5 +169,6 @@ public class MainActivity extends AppCompatActivity {
         mScroll = (ScrollView) findViewById(R.id.scrollLog);
         mLog = (TextView) findViewById(R.id.tvLog);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mPlayButton=findViewById(R.id.btnPlayMusic);
     }
 }
