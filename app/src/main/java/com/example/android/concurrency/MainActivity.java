@@ -44,15 +44,19 @@ public class MainActivity extends AppCompatActivity {
             mMusicPlayerService=myServiceBinder.getService();
             mBound=true;
             Log.d(TAG, "onServiceConnected");
+
+            if(mMusicPlayerService.isPlaying()){
+                mPlayButton.setText("Pause");
+            }
+
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(TAG, "onServiceDisconnected");
+            mBound=false;
         }
     };
-
-
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -85,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
                 mMusicPlayerService.pause();
                 mPlayButton.setText("Play");
             }else{
-
                 Intent intent=new Intent(MainActivity.this,MusicPlayerService.class);
                 startService(intent);
 
@@ -111,19 +114,10 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
-    public void clearOutput(View v) {
-
-        Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
-        stopService(intent);
-
-        mLog.setText("");
-        scrollTextToEnd();
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
-
+        Log.d(TAG, "onStart: called");
         Intent intent=new Intent(MainActivity.this,MusicPlayerService.class);
         bindService(intent,mServiceCon,Context.BIND_AUTO_CREATE);
 
@@ -135,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
         if(mBound){
             unbindService(mServiceCon);
             mBound=false;
@@ -144,6 +137,15 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(getApplicationContext())
                 .unregisterReceiver(mReceiver);
 
+    }
+
+    public void clearOutput(View v) {
+
+        Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
+        stopService(intent);
+
+        mLog.setText("");
+        scrollTextToEnd();
     }
 
     public void log(String message) {

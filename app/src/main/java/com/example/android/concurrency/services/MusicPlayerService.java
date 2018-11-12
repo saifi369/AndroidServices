@@ -39,21 +39,22 @@ public class MusicPlayerService extends Service {
                         .sendBroadcast(intent);
 
                 stopSelf();
+
             }
         });
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand: ");
-
-        return START_NOT_STICKY;
     }
 
     public class MyServiceBinder extends Binder{
         public MusicPlayerService getService(){
             return  MusicPlayerService.this;
         }
+    }
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand: ");
+        return START_NOT_STICKY;
     }
 
     @Nullable
@@ -66,7 +67,13 @@ public class MusicPlayerService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind: ");
-        return super.onUnbind(intent);
+        return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+        Log.d(TAG, "onRebind: ");
     }
 
     @Override
