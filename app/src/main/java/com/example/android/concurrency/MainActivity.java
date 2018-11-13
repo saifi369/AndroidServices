@@ -105,15 +105,15 @@ public class MainActivity extends AppCompatActivity {
 
         //send intent to download service
 
-//        for (String song:Playlist.songs){
-//            Intent intent=new Intent(MainActivity.this,MyIntentService.class);
-//            intent.putExtra(MESSAGE_KEY,song);
-//
-//            startService(intent);
-//        }
+        for (String song:Playlist.songs){
+            Intent intent=new Intent(MainActivity.this,MyIntentService.class);
+            intent.putExtra(MESSAGE_KEY,song);
 
-        Intent intent=new Intent(MainActivity.this,MyForegroundService.class);
-        startService(intent);
+            startService(intent);
+        }
+
+//        Intent intent=new Intent(MainActivity.this,MyForegroundService.class);
+//        startService(intent);
 
     }
 
