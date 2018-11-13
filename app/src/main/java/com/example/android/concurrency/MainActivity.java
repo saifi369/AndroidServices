@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.android.concurrency.constants.Constants;
 import com.example.android.concurrency.services.MusicPlayerService;
 import com.example.android.concurrency.services.MyDownloadService;
 import com.example.android.concurrency.services.MyForegroundService;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 mPlayButton.setText("Play");
             }else{
                 Intent intent=new Intent(MainActivity.this,MusicPlayerService.class);
+                intent.setAction(Constants.MUSIC_SERVICE_ACTION_START);
                 startService(intent);
 
                 mMusicPlayerService.play();

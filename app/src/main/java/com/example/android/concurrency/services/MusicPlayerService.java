@@ -1,6 +1,7 @@
 package com.example.android.concurrency.services;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -14,6 +15,7 @@ import android.util.Log;
 
 import com.example.android.concurrency.MainActivity;
 import com.example.android.concurrency.R;
+import com.example.android.concurrency.constants.Constants;
 
 import java.net.Inet4Address;
 
@@ -37,7 +39,7 @@ public class MusicPlayerService extends Service {
                 intent.putExtra(MainActivity.MESSAGE_KEY,"done");
                 LocalBroadcastManager.getInstance(getApplicationContext())
                         .sendBroadcast(intent);
-
+                stopForeground(true);
                 stopSelf();
 
             }
@@ -53,8 +55,70 @@ public class MusicPlayerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        switch (intent.getAction()){
+
+            case Constants.MUSIC_SERVICE_ACTION_PLAY:{
+                Log.d(TAG, "onStartCommand: play called");
+                play();
+                break;
+            }
+            case Constants.MUSIC_SERVICE_ACTION_PAUSE:{
+                Log.d(TAG, "onStartCommand: pause called");
+                pause();
+                break;
+            }
+            case Constants.MUSIC_SERVICE_ACTION_STOP:{
+                Log.d(TAG, "onStartCommand: stop called");
+                stopForeground(true);
+                stopSelf();
+            }
+            case Constants.MUSIC_SERVICE_ACTION_START:{
+                Log.d(TAG, "onStartCommand: start called");
+                showNotification();
+                break;
+            }
+            default:{
+
+            }
+        }
+
         Log.d(TAG, "onStartCommand: ");
         return START_NOT_STICKY;
+    }
+
+    private void showNotification() {
+
+        NotificationCompat.Builder builder=new NotificationCompat.Builder(this,"channelId");
+
+        //Intent for play button
+        Intent pIntent=new Intent(this,MusicPlayerService.class);
+        pIntent.setAction(Constants.MUSIC_SERVICE_ACTION_PLAY);
+
+        PendingIntent playIntent=PendingIntent.getService(this,100,pIntent,0);
+
+        //Intent for pause button
+        Intent psIntent=new Intent(this,MusicPlayerService.class);
+        psIntent.setAction(Constants.MUSIC_SERVICE_ACTION_PAUSE);
+
+        PendingIntent pauseIntent=PendingIntent.getService(this,100,psIntent,0);
+
+        //Intent for stop button
+        Intent sIntent=new Intent(this,MusicPlayerService.class);
+        sIntent.setAction(Constants.MUSIC_SERVICE_ACTION_STOP);
+
+        PendingIntent stopIntent=PendingIntent.getService(this,100,sIntent,0);
+
+        builder.setContentTitle("U4Universe Music Player")
+                .setContentText("This is demo music player")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_play,"Play",playIntent))
+                .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_play,"Pause",pauseIntent))
+                .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_play,"Stop",stopIntent));
+
+
+        startForeground(123,builder.build());
+
     }
 
     @Nullable
