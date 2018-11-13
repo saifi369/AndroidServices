@@ -6,10 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -21,9 +19,8 @@ import android.widget.TextView;
 
 import com.example.android.concurrency.services.MusicPlayerService;
 import com.example.android.concurrency.services.MyDownloadService;
+import com.example.android.concurrency.services.MyForegroundService;
 import com.example.android.concurrency.services.MyIntentService;
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -112,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
 //
 //            startService(intent);
 //        }
+
+        Intent intent=new Intent(MainActivity.this,MyForegroundService.class);
+        startService(intent);
+
     }
 
     @Override

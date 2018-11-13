@@ -3,6 +3,7 @@ package com.example.android.concurrency.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
