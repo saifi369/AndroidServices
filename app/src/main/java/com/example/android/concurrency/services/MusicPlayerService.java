@@ -1,9 +1,13 @@
 package com.example.android.concurrency.services;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
@@ -45,6 +49,7 @@ public class MusicPlayerService extends Service {
             }
         });
     }
+
 
     public class MyServiceBinder extends Binder{
         public MusicPlayerService getService(){
@@ -89,7 +94,7 @@ public class MusicPlayerService extends Service {
 
     private void showNotification() {
 
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(this,"channelId");
+        NotificationCompat.Builder builder=new NotificationCompat.Builder(this,"FileDownload");
 
         //Intent for play button
         Intent pIntent=new Intent(this,MusicPlayerService.class);

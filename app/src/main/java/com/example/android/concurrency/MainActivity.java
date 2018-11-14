@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -89,7 +90,11 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 Intent intent=new Intent(MainActivity.this,MusicPlayerService.class);
                 intent.setAction(Constants.MUSIC_SERVICE_ACTION_START);
-                startService(intent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(intent);
+                }else{
+                    startService(intent);
+                }
 
                 mMusicPlayerService.play();
                 mPlayButton.setText("Pause");
