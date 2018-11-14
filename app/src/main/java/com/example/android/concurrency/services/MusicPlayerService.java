@@ -23,6 +23,8 @@ import com.example.android.concurrency.constants.Constants;
 
 import java.net.Inet4Address;
 
+import static com.example.android.concurrency.App.CHANNEL_ID;
+
 public class MusicPlayerService extends Service {
 
     private static final String TAG = "MyTag";
@@ -77,6 +79,7 @@ public class MusicPlayerService extends Service {
                 Log.d(TAG, "onStartCommand: stop called");
                 stopForeground(true);
                 stopSelf();
+                break;
             }
             case Constants.MUSIC_SERVICE_ACTION_START:{
                 Log.d(TAG, "onStartCommand: start called");
@@ -94,7 +97,7 @@ public class MusicPlayerService extends Service {
 
     private void showNotification() {
 
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(this,"FileDownload");
+        NotificationCompat.Builder builder=new NotificationCompat.Builder(this,CHANNEL_ID);
 
         //Intent for play button
         Intent pIntent=new Intent(this,MusicPlayerService.class);

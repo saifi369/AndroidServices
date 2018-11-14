@@ -9,6 +9,7 @@ import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,6 +24,7 @@ import com.example.android.concurrency.services.MusicPlayerService;
 import com.example.android.concurrency.services.MyDownloadService;
 import com.example.android.concurrency.services.MyForegroundService;
 import com.example.android.concurrency.services.MyIntentService;
+import com.example.android.concurrency.services.MyOreoService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -88,13 +90,10 @@ public class MainActivity extends AppCompatActivity {
                 mMusicPlayerService.pause();
                 mPlayButton.setText("Play");
             }else{
+                Log.d(TAG, "onBtnMusicClicked: called");
                 Intent intent=new Intent(MainActivity.this,MusicPlayerService.class);
                 intent.setAction(Constants.MUSIC_SERVICE_ACTION_START);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(intent);
-                }else{
-                    startService(intent);
-                }
+                ContextCompat.startForegroundService(this,intent);
 
                 mMusicPlayerService.play();
                 mPlayButton.setText("Pause");
@@ -110,15 +109,15 @@ public class MainActivity extends AppCompatActivity {
 
         //send intent to download service
 
-        for (String song:Playlist.songs){
-            Intent intent=new Intent(MainActivity.this,MyIntentService.class);
-            intent.putExtra(MESSAGE_KEY,song);
+//        for (String song:Playlist.songs){
+//            Intent intent=new Intent(MainActivity.this,MyIntentService.class);
+//            intent.putExtra(MESSAGE_KEY,song);
+//
+//            startService(intent);
+//        }
 
-            startService(intent);
-        }
-
-//        Intent intent=new Intent(MainActivity.this,MyForegroundService.class);
-//        startService(intent);
+        Intent intent=new Intent(MainActivity.this,MyOreoService.class);
+        ContextCompat.startForegroundService(this,intent);
 
     }
 
@@ -149,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void clearOutput(View v) {
 
-        Intent intent=new Intent(MainActivity.this,MyDownloadService.class);
+        Intent intent=new Intent(MainActivity.this,MyOreoService.class);
         stopService(intent);
 
         mLog.setText("");
